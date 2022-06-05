@@ -1,0 +1,151 @@
+use sample_upc
+
+// Crear una colección y validar con JSON Schema
+
+db.createCollection(
+    "students",
+    { validator:
+        { $jsonSchema:
+                {   bsonType: "object",
+                    description: "Document describing a student",
+                    required: ["name", "year", "courses", "address"],
+                    properties:
+                        {   "name":{
+                            bsonType: "string",
+                            description: "Name must be a string and is required"
+                            },
+                            "year": {
+                                bsonType: "int",
+                                minimum: 2000,
+                                maximum: 2022,
+                                description: "Year must be an int and is required"
+                            },
+                            "courses" : {
+                                bsonType: "array",
+                                description: "Course must be an array of strings",
+                                minItems: 1,
+                                uniqueItems: true,
+                                items: {
+                                    bsonType: "string"
+                                }
+                            },
+                            "address" : {
+                                bsonType: "object",
+                                required: ["city"],
+                                properties: {
+                                    "city": {
+                                        bsonType: "string",
+                                        description: "City must be a string and is required"
+                                    },
+                                    "street":{
+                                        bsonType: "string",
+                                        description: "Street must be a string and is optional"
+                                    }
+
+                                }
+                            },
+                            "genre": {
+                                enum: ["M", "F"],
+                                description: "Genre can only be either 'M' or 'F' and is optional"
+                           }
+                         }
+                }
+        }
+    }
+);
+
+// Caso erróneo de inserción de documento
+db.students.insertOne(
+    {
+        name: "Jorge Mayta",
+        year: NumberInt(2019),
+        courses: ["SI400"]
+    }
+);
+
+db.students.find();
+
+// Caso válido de inserción de documento
+db.students.insertOne(
+    {
+        name: "Raúl Perez",
+        year: NumberInt(2020),
+        courses: ["SI424"],
+        address: {
+            city: "Lima",
+            street :"1116 Angamos Avenue"
+        }
+    }
+);
+
+db.students.find();
+
+db.students.insertOne(
+    {
+        name: "Liz Ugarte",
+        year: NumberInt(2020),
+        courses: ["SI424"],
+        address: {
+            city: "Lima",
+            street :"1116 Angamos Avenue"
+        },
+        genre:"F"
+    }
+);
+
+db.students.find();
+
+// Crear una colección, utilizar JSON Schema con la opción validationAction igual a warn
+
+db.createCollection(
+    "contacts",{
+        validator: {
+            $jsonSchema:{
+                bsonType: "object",
+                description: "Document describing a contact",
+                required: ["email"],
+                properties: {
+                    telephone: {
+                        bsonType: "string",
+                        description: "Telephone must be a string and is optional"
+                    },
+                    email: {
+                        bsonType: "string",
+                        pattern: "@upc\.edu$",
+                        description: "Email must be a string and is required"
+                    }
+                }
+            }
+        }
+    }
+);
+
+db.runCommand( {
+    collMod: "contacts",
+    validator: {
+            $jsonSchema:{
+                bsonType: "object",
+                description: "Document describing a contact",
+                required: ["email"],
+                properties: {
+                    telephone: {
+                        bsonType: "string",
+                        description: "Telephone must be a string and is optional"
+                    },
+                    email: {
+                        bsonType: "string",
+                        pattern: "@upc\.edu$",
+                        description: "Email must be a string and is required"
+                    }
+                }
+            }
+        },
+        validationAction: "warn"
+});
+
+
+db.contacts.insertOne({telephone:"987654321"});
+
+db.contacts.insertOne({email: "jmayta@upc.pe"});
+
+db.contacts.find();
