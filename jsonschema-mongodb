@@ -80,6 +80,7 @@ db.students.insertOne(
 
 db.students.find();
 
+// Caso válido de inserción de documento
 db.students.insertOne(
     {
         name: "Liz Ugarte",
@@ -93,10 +94,23 @@ db.students.insertOne(
     }
 );
 
+db.students.insertOne(
+    {
+        name: "Carlos Machado",
+        year: NumberInt(2020),
+        courses: ["SI400", "SI424"],
+        address: {
+            city: "Cuzco"
+        },
+        genre:"F"
+    }
+)
+
 db.students.find();
 
 // Crear una colección, utilizar JSON Schema con la opción validationAction igual a warn
-
+// validationLevel: Por defecto el valor es strict
+// validationAction: Por defecto el valor es error
 db.createCollection(
     "contacts",{
         validator: {
