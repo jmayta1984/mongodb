@@ -2,6 +2,25 @@ use sample_upc
 
 // Crear una colección y validar con JSON Schema
 
+// Validación tiene dos opciones
+// validationLevel
+// validationAction
+
+// validationLevel: Determina a que documentos se le aplicación las reglas de validación
+// - strict: Valor por defecto. Las reglas de validación se aplican a las insercciones y actualizaciones.
+// - moderate: Colocarlo de manera explícita. Las reglas se aplican solo a las insercciones
+//             y a los documento que cumplen la regla de validación.
+
+// validationAction: Determina la acción a ejecutar cuando un documento no cumple con la regla de validación.
+// - error: Valor por defecto. Rechazar la insercción o actualización del documento.
+// - warn: Colocarlo de manera explícita. Si se permite la insercción o actualización del a pesar que pueda
+//         no cumplir con las reglas de validación. Se coloca una advertencia.
+
+
+// Las validaciones se aplican a dos operaciones
+// Insercción de un nuevo documento
+// Actualización de un documento existente
+
 db.createCollection(
     "students",
     { validator:
