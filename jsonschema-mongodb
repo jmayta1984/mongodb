@@ -6,16 +6,15 @@ use sample_upc
 // validationLevel
 // validationAction
 
-// validationLevel: Determina a que documentos se le aplicación las reglas de validación
+// validationLevel: Determina a que documentos se le aplica las reglas de validación
 // - strict: Valor por defecto. Las reglas de validación se aplican a las insercciones y actualizaciones.
 // - moderate: Colocarlo de manera explícita. Las reglas se aplican solo a las insercciones
-//             y a los documento que cumplen la regla de validación.
+//             y a los documento que cumplen las reglas de validación.
 
 // validationAction: Determina la acción a ejecutar cuando un documento no cumple con la regla de validación.
-// - error: Valor por defecto. Rechazar la insercción o actualización del documento.
-// - warn: Colocarlo de manera explícita. Si se permite la insercción o actualización del a pesar que pueda
-//         no cumplir con las reglas de validación. Se coloca una advertencia.
-
+// - error: Valor por defecto. Rechazar la insercción o actualización del documento que no cumple con la regla de validación.
+// - warn: Colocarlo de manera explícita. Si se permite la insercción o actualización del documento a pesar que
+//         no cumpla con las reglas de validación. Se coloca una advertencia.
 
 // Las validaciones se aplican a dos operaciones
 // Insercción de un nuevo documento
@@ -113,6 +112,7 @@ db.students.insertOne(
     }
 );
 
+// Caso válido de inserción de documento
 db.students.insertOne(
     {
         name: "Carlos Machado",
@@ -126,6 +126,19 @@ db.students.insertOne(
 )
 
 db.students.find();
+
+// Caso válido de insercción de documento
+db.students.insertOne(
+    {
+        name: "Julio Martínez",
+        year: NumberInt(2015),
+        courses:["SI424"],
+        address: {
+            city: "Trujillo"
+        },
+        genre: "M"
+    }
+)
 
 // Crear una colección, utilizar JSON Schema con la opción validationAction igual a warn
 // validationLevel: Por defecto el valor es strict
@@ -173,12 +186,56 @@ db.runCommand( {
                 }
             }
         },
-        validationAction: "warn"
+    validationAction: "warn"
 });
-
 
 db.contacts.insertOne({telephone:"987654321"});
 
 db.contacts.insertOne({email: "jmayta@upc.pe"});
 
+db.contacts.insertOne({email: "jrios@upc.edu"});
+
 db.contacts.find();
+
+
+db.runCommand({
+    collMod:"contacts",
+    validator: {},
+    validationLevel: "off"
+});
+
+
+db.createCollection("teachers",{
+    validator: {
+        $or: [
+            {$jsonSchema:
+                {
+                    bsonType: "object",
+                    description: "Document describing a teacher",
+                    required: ["first_name"],
+                    properties: {
+                        first_name: {
+                            type:"string",
+                            description: "First name must a string and is required."
+                        }
+                    }
+                },
+            },
+            {$jsonSchema:
+                {
+                    bsonType: "object",
+                    description: "Document describing a teacher",
+                    required: ["last_name"],
+                    properties: {
+                        last_name: {
+                            type:"string",
+                            description: "Last name must a string and is required."
+                        }
+                    }
+                }
+            }
+        ]
+    }
+ });
+
+ db.teachers.insertOne({first_name: "Jorge"});
