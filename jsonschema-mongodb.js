@@ -20,6 +20,10 @@ use sample_upc
 // Insercción de un nuevo documento
 // Actualización de un documento existente
 
+// Crear una colección, utilizar JSON Schema validation
+// validationLevel: Por defecto el valor es strict
+// validationAction: Por defecto el valor es error
+
 db.createCollection(
     "students",
     { validator:
